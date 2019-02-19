@@ -1,2 +1,2 @@
 # INF3105
-Structures de donnÃ©es et algorithmes
+Structures de données et algorithmes

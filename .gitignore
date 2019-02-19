@@ -1,6 +1,9 @@
 # VSCODE
 *.vscode
 
+# TP1
+TP1/*.txt
+
 # Prerequisites
 *.d
 

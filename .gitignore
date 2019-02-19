@@ -3,6 +3,7 @@
 
 # TP1
 TP1/*.txt
+!TP1/test*
 
 # Prerequisites
 *.d

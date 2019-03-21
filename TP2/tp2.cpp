@@ -244,8 +244,8 @@ int main(int argc, char const *argv[])
 
     repartirInputs(arbres, inputs);
 
-    arbres.arbreTypes.afficher();
-    arbres.arbreFoncteurs.afficher();
+    // arbres.arbreTypes.afficher();
+    // arbres.arbreFoncteurs.afficher();
 
     while (getline(cin, input))
     {

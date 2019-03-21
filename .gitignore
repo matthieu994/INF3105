@@ -38,5 +38,6 @@ TP1/*.txt
 *.out
 *.app
 
-# TP1
+# TP1-2
 TP1/*.txt
+TP2/tp2

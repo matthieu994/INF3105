@@ -64,6 +64,7 @@ void repartirInputs(Arbres &arbres, vector<string> inputs)
     string arg;
     for (size_t i = 0; i < inputs.size(); i++)
     {
+        stream.clear();
         stream = istringstream(inputs[i]);
         stream >> arg;
 

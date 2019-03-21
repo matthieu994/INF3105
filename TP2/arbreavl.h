@@ -48,7 +48,7 @@ class ArbreAVL
   private:
     struct Noeud
     {
-        Noeud(const T &);
+         Noeud(const T &);
         T contenu;
         int equilibre;
         Noeud *gauche,

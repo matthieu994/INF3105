@@ -48,7 +48,7 @@ class ArbreMapAVL
     ArbreMapAVL &operator=(const ArbreMapAVL &);
 
   private:
-    class Noeud
+    struct Noeud
     {
         Noeud(const K &cle_, const V &valeur_);
         K cle;

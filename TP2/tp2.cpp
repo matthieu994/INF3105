@@ -64,9 +64,7 @@ void repartirInputs(Arbres &arbres, vector<string> inputs)
     string arg;
     for (size_t i = 0; i < inputs.size(); i++)
     {
-        stream.str("");
-        stream.clear();
-        stream = istringstream(inputs[i]);
+        stream.str(inputs[i]);
         stream >> arg;
 
         if (arg == "type")
@@ -77,14 +75,16 @@ void repartirInputs(Arbres &arbres, vector<string> inputs)
             vector<string> foncteur;
             size_t j = i;
             foncteur.push_back(inputs[j++]);
-            stream = istringstream(inputs[j]);
+            stream.clear();
+            stream.str(inputs[j]);
             stream >> arg;
             while (arg != "type" && arg != "foncteur" && j < inputs.size())
             {
                 foncteur.push_back(inputs[j++]);
                 if (j < inputs.size())
                 {
-                    stream = istringstream(inputs[j]);
+                    stream.clear();
+                    stream.str(inputs[j]);
                     stream >> arg;
                 }
             }
@@ -96,7 +96,7 @@ void repartirInputs(Arbres &arbres, vector<string> inputs)
 
 void insererType(Arbres &arbres, string type)
 {
-    istringstream stream = istringstream(type);
+    istringstream stream(type);
     string identificateur;
     stream >> identificateur;
     stream >> identificateur;
@@ -117,7 +117,7 @@ void insererType(Arbres &arbres, string type)
 
 void insererFoncteur(Arbres &arbres, vector<string> foncteur)
 {
-    istringstream stream = istringstream(foncteur[0]);
+    istringstream stream(foncteur[0]);
     string identificateur;
     stream >> identificateur;
     stream >> identificateur;
@@ -146,7 +146,8 @@ void insererFoncteur(Arbres &arbres, vector<string> foncteur)
         size_t j;
         for (size_t i = 1; i < foncteur.size(); i++)
         {
-            stream = istringstream(foncteur[i]);
+            stream.clear();
+            stream.str(foncteur[i]);
             j = 0;
 
             while (stream >> element)
@@ -171,19 +172,26 @@ void insererFoncteur(Arbres &arbres, vector<string> foncteur)
 void afficherValeurPossible(Arbres arbres, string input)
 {
     string identificateur = input.substr(0, input.find("("));
-    vector<vector<string>> elements = arbres.arbreFoncteurs[identificateur];
 
-    istringstream stream(input);
-    string arg;
-    int position = -1;
-
-    while (stream >> arg)
+    if (!arbres.arbreFoncteurs.contient(identificateur))
     {
-        position++;
-        if (arg.find("?") != string::npos)
+        cerr << "Foncteur inconnu" << endl;
+    }
+    else
+    {
+        vector<vector<string>> elements = arbres.arbreFoncteurs[identificateur];
+        istringstream stream(input);
+        string arg;
+        int position = -1;
+
+        while (stream >> arg)
         {
-            afficherType(arbres, elements[0][position]);
-            return;
+            position++;
+            if (arg.find("?") != string::npos)
+            {
+                afficherType(arbres, elements[0][position]);
+                return;
+            }
         }
     }
 }
@@ -251,10 +259,10 @@ int main(int argc, char const *argv[])
             else if (arbres.arbreFoncteurs.contient(identificateur))
                 afficherFoncteur(arbres, identificateur);
             else
-                cout << "Identificateur inconnu" << endl;
+                cerr << "Identificateur inconnu" << endl;
         }
         else
-            cout << "Commande inconnue" << endl;
+            cerr << "Commande inconnue" << endl;
     }
 
     return 0;

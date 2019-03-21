@@ -1,6 +1,6 @@
 type booleen = {vrai, faux}
 type nombre = {un, deux, trois}
-foncteur et :: booleen, nombre, booleen
+foncteur et :: booleen, booleen, booleen
 (vrai, vrai, vrai)
 (vrai, faux, faux)
 (faux, vrai, faux)

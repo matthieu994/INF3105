@@ -2,7 +2,7 @@
 
 all: tp2
 
-tp2: tp2.cpp arbreavl.h e1.txt
+tp2: tp2.cpp arbremapavl.h e1.txt
 	g++ -o tp2 tp2.cpp -Wall
 
 clean :

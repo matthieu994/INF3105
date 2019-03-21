@@ -37,3 +37,6 @@ TP1/*.txt
 *.exe
 *.out
 *.app
+
+# TP1
+TP1/*.txt

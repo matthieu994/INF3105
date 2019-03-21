@@ -3,7 +3,7 @@
 #include <sstream>
 #include <fstream>
 #include <algorithm>
-#include "arbreavl.h"
+#include "arbremapavl.h"
 
 using namespace std;
 
@@ -12,14 +12,17 @@ using namespace std;
 
 struct Arbres
 {
-    ArbreAVL<pair<string, vector<string>>> arbreTypes;
-    ArbreAVL<pair<string, vector<vector<string>>>> arbreFoncteurs;
+    ArbreMapAVL<string, vector<string>> arbreTypes;
+    ArbreMapAVL<string, vector<vector<string>>> arbreFoncteurs;
 };
 
 string format(string &s);
 void repartirInputs(Arbres &arbres, vector<string> inputs);
 void insererType(Arbres &arbres, string type);
 void insererFoncteur(Arbres &arbres, vector<string> foncteur);
+void afficherValeurPossible(Arbres arbres, string input);
+void afficherType(Arbres arbres, string type);
+void afficherFoncteur(Arbres arbres, string foncteur);
 
 void afficher_vector(vector<string> &v)
 {
@@ -30,6 +33,13 @@ void afficher_vector(vector<string> &v)
     }
     cout << endl
          << "----" << endl;
+}
+
+bool find_vector(vector<string> v, string element)
+{
+    if (find(v.begin(), v.end(), element) != v.end())
+        return true;
+    return false;
 }
 
 string format(string &s, bool type)
@@ -67,11 +77,14 @@ void repartirInputs(Arbres &arbres, vector<string> inputs)
             foncteur.push_back(inputs[j++]);
             stream = istringstream(inputs[j]);
             stream >> arg;
-            while (arg != "type" && arg != "foncteur" && j < inputs.size() - 1)
+            while (arg != "type" && arg != "foncteur" && j < inputs.size())
             {
                 foncteur.push_back(inputs[j++]);
-                stream = istringstream(inputs[j]);
-                stream >> arg;
+                if (j < inputs.size())
+                {
+                    stream = istringstream(inputs[j]);
+                    stream >> arg;
+                }
             }
             i = j - 1;
             insererFoncteur(arbres, foncteur);
@@ -88,7 +101,6 @@ void insererType(Arbres &arbres, string type)
 
     if (identificateur != "type" && identificateur != "foncteur" && !arbres.arbreTypes.contient(identificateur) && !arbres.arbreFoncteurs.contient(identificateur))
     {
-        pair<string, vector<string>> contenu;
         vector<string> elements;
         string element;
         // enlever '='
@@ -97,9 +109,7 @@ void insererType(Arbres &arbres, string type)
         while (stream >> element)
             elements.push_back(format(element, true));
 
-        contenu.first = identificateur;
-        contenu.second = elements;
-        arbres.arbreTypes.inserer(contenu);
+        arbres.arbreTypes.inserer(identificateur, elements);
     }
 }
 
@@ -131,26 +141,77 @@ void insererFoncteur(Arbres &arbres, vector<string> foncteur)
         }
 
         // remplissage des m clauses
+        size_t j;
         for (size_t i = 1; i < foncteur.size(); i++)
         {
             stream = istringstream(foncteur[i]);
+            j = 0;
 
             while (stream >> element)
             {
                 element = format(element, false);
+                string local_identificateur = elements[0][j];
                 // verifier que le type existe dans l'arbre des types
-                // if (!arbres.arbreTypes.get(elements[0][j]).)
-                // {
-                //     cerr << "Erreur de type pour le foncteur <" << identificateur << "> : " << element << endl;
-                //     return;
-                // }
+                if (!find_vector(arbres.arbreTypes[local_identificateur], element))
+                {
+                    cerr << "Erreur de type pour le foncteur <" << identificateur << "> : " << element << endl;
+                    return;
+                }
+                j++;
                 elements[i].push_back(format(element, false));
             }
         }
 
-        contenu.first = identificateur;
-        contenu.second = elements;
-        arbres.arbreFoncteurs.inserer(contenu);
+        arbres.arbreFoncteurs.inserer(identificateur, elements);
+    }
+}
+
+void afficherValeurPossible(Arbres arbres, string input)
+{
+    string identificateur = input.substr(0, input.find("("));
+    vector<vector<string>> elements = arbres.arbreFoncteurs[identificateur];
+
+    istringstream stream(input);
+    string arg;
+    int position = -1;
+
+    while (stream >> arg)
+    {
+        position++;
+        if (arg.find("?") != string::npos)
+        {
+            afficherType(arbres, elements[0][position]);
+            return;
+        }
+    }
+}
+
+void afficherType(Arbres arbres, string type)
+{
+    vector<string> elements = arbres.arbreTypes[type];
+    cout << "{";
+    for (size_t i = 0; i < elements.size(); i++)
+    {
+        cout << elements[i];
+        if (i < elements.size() - 1)
+            cout << ", ";
+    }
+    cout << "}" << endl;
+}
+
+void afficherFoncteur(Arbres arbres, string foncteur)
+{
+    vector<vector<string>> elements = arbres.arbreFoncteurs[foncteur];
+    for (size_t i = 1; i < elements.size(); i++)
+    {
+        cout << "(";
+        for (size_t j = 0; j < elements[i].size(); j++)
+        {
+            cout << elements[i][j];
+            if (j < elements[i].size() - 1)
+                cout << ", ";
+        }
+        cout << ")" << endl;
     }
 }
 
@@ -176,8 +237,23 @@ int main(int argc, char const *argv[])
     arbres.arbreTypes.afficher();
     arbres.arbreFoncteurs.afficher();
 
-    while (cin >> input)
+    while (getline(cin, input))
     {
+        if (input.find("(") != string::npos)
+            afficherValeurPossible(arbres, input);
+        else if (input.find("?") != string::npos)
+        {
+            string identificateur = input.substr(0, input.find("?"));
+            if (arbres.arbreTypes.contient(identificateur))
+                afficherType(arbres, identificateur);
+            else if (arbres.arbreFoncteurs.contient(identificateur))
+                afficherFoncteur(arbres, identificateur);
+            else
+                cout << "Identificateur inconnu" << endl;
+        }
+        else
+            cout << "Commande inconnue" << endl;
     }
+
     return 0;
 }

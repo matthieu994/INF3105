@@ -137,7 +137,7 @@ void insererFoncteur(Arbres &arbres, vector<string> foncteur)
             if (!arbres.arbreTypes.contient(element))
             {
                 cerr << "Erreur de type pour le foncteur <" << identificateur << "> : " << element << endl;
-                return;
+                exit(1);
             }
             elements[0].push_back(element);
         }
@@ -158,7 +158,7 @@ void insererFoncteur(Arbres &arbres, vector<string> foncteur)
                 if (!find_vector(arbres.arbreTypes[local_identificateur], element))
                 {
                     cerr << "Erreur de type pour le foncteur <" << identificateur << "> : " << element << endl;
-                    return;
+                    exit(1);
                 }
                 j++;
                 elements[i].push_back(format(element, false));
@@ -176,6 +176,7 @@ void afficherValeurPossible(Arbres arbres, string input)
     if (!arbres.arbreFoncteurs.contient(identificateur))
     {
         cerr << "Foncteur inconnu" << endl;
+        exit(1);
     }
     else
     {
@@ -259,10 +260,16 @@ int main(int argc, char const *argv[])
             else if (arbres.arbreFoncteurs.contient(identificateur))
                 afficherFoncteur(arbres, identificateur);
             else
+            {
                 cerr << "Identificateur inconnu" << endl;
+                exit(1);
+            }
         }
         else
+        {
             cerr << "Commande inconnue" << endl;
+            exit(1);
+        }
     }
 
     return 0;

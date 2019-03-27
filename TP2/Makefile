@@ -2,7 +2,7 @@
 
 all: tp2
 
-tp2: tp2.cpp arbremapavl.h e1.txt
+tp2: tp2.cpp arbremapavl.h
 	g++ -o tp2 tp2.cpp -std=c++11 -Wall
 
 clean :

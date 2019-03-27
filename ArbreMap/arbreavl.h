@@ -1,12 +1,3 @@
-/* UQAM / Département d'informatique
-   INF3105 - Structures de données et algorithmes
-   Squelette pour classe générique ArbreAVL<T> pour le Lab6 et le TP2.
-
-   AUTEUR(S):
-    1) Nom + Code permanent du l'étudiant.e 1
-    2) Nom + Code permanent du l'étudiant.e 2
-*/
-
 #if !defined(__ARBREAVL_H__)
 #define __ARBREAVL_H__
 #include <cassert>
@@ -478,12 +469,12 @@ typename ArbreAVL<T>::Iterateur ArbreAVL<T>::rechercher(const T &e) const
     Noeud *n = racine;
     while (n)
     {
-        if (e < n->cle)
+        if (e < n->contenu)
         {
             iter.chemin.empiler(n);
             n = n->gauche;
         }
-        else if (n->cle < e)
+        else if (n->contenu < e)
             n = n->droite;
         else
         {

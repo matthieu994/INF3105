@@ -16,13 +16,14 @@ struct Arbres
     ArbreMapAVL<string, vector<vector<string>>> arbreFoncteurs;
 };
 
-string format(string &s);
+string format(string &s, bool type);
 void repartirInputs(Arbres &arbres, vector<string> inputs);
 void insererType(Arbres &arbres, string type);
 void insererFoncteur(Arbres &arbres, vector<string> foncteur);
-void afficherValeurPossible(Arbres arbres, string input);
-void afficherType(Arbres arbres, string type);
-void afficherFoncteur(Arbres arbres, string foncteur);
+void trouverFoncteur(const Arbres &arbres, const string &input);
+void afficherValeurs(const vector<string> &elements);
+void afficherType(const Arbres &arbres, const string &type);
+void afficherFoncteur(const Arbres &arbres, const string &foncteur);
 
 void afficher_vector(vector<string> &v)
 {
@@ -42,6 +43,7 @@ bool find_vector(vector<string> v, string element)
     return false;
 }
 
+// Retire accolades parenthèses et virgules selon l'entrée
 string format(string &s, bool type)
 {
     if (type)
@@ -169,7 +171,38 @@ void insererFoncteur(Arbres &arbres, vector<string> foncteur)
     }
 }
 
-void afficherValeurPossible(Arbres arbres, string input)
+void chercherValeurPossible(const Arbres &arbres, const vector<string> &input, const string &identificateur, const size_t &position)
+{
+    vector<vector<string>> elements = arbres.arbreFoncteurs[identificateur];
+    vector<string> valeurs_possibles;
+    size_t longueur = input.size();
+    size_t count = 0;
+
+    for (vector<string> &element : elements)
+    {
+        if (count == 0)
+        {
+            count++;
+            continue;
+        }
+
+        if (element.size() == longueur && !find_vector(valeurs_possibles, element[position]))
+        {
+            bool correspondant = true;
+            for (size_t i = 0; i < longueur; i++)
+            {
+                if (i != position && element[i] != input[i])
+                    correspondant = false;
+            }
+            if (correspondant)
+                valeurs_possibles.push_back(element[position]);
+        }
+    }
+
+    afficherValeurs(valeurs_possibles);
+}
+
+void trouverFoncteur(const Arbres &arbres, const string &input)
 {
     string identificateur = input.substr(0, input.find("("));
 
@@ -180,26 +213,32 @@ void afficherValeurPossible(Arbres arbres, string input)
     }
     else
     {
-        vector<vector<string>> elements = arbres.arbreFoncteurs[identificateur];
         istringstream stream(input);
         string arg;
-        int position = -1;
+        size_t position = -1;
 
         while (stream >> arg)
         {
             position++;
             if (arg.find("?") != string::npos)
             {
-                afficherType(arbres, elements[0][position]);
-                return;
+                // Creer vecteurs avec arguments de la requete
+                vector<string> input_vector;
+                string arguments = input.substr(input.find("("), input.length());
+                istringstream stream(arguments);
+                string argument;
+
+                while (stream >> argument)
+                    input_vector.push_back(format(argument, false));
+
+                return chercherValeurPossible(arbres, input_vector, identificateur, position);
             }
         }
     }
 }
 
-void afficherType(Arbres arbres, string type)
+void afficherValeurs(const vector<string> &elements)
 {
-    vector<string> elements = arbres.arbreTypes[type];
     cout << "{";
     for (size_t i = 0; i < elements.size(); i++)
     {
@@ -210,7 +249,13 @@ void afficherType(Arbres arbres, string type)
     cout << "}" << endl;
 }
 
-void afficherFoncteur(Arbres arbres, string foncteur)
+void afficherType(const Arbres &arbres, const string &type)
+{
+    vector<string> elements = arbres.arbreTypes[type];
+    afficherValeurs(elements);
+}
+
+void afficherFoncteur(const Arbres &arbres, const string &foncteur)
 {
     vector<vector<string>> elements = arbres.arbreFoncteurs[foncteur];
     for (size_t i = 1; i < elements.size(); i++)
@@ -251,7 +296,7 @@ int main(int argc, char const *argv[])
     while (getline(cin, input))
     {
         if (input.find("(") != string::npos)
-            afficherValeurPossible(arbres, input);
+            trouverFoncteur(arbres, input);
         else if (input.find("?") != string::npos)
         {
             string identificateur = input.substr(0, input.find("?"));

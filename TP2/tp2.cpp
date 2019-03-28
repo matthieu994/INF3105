@@ -7,9 +7,7 @@
 
 using namespace std;
 
-// exit on error ?
-// file / cin ?
-
+// Structure qui contient les 2 arbres nécessaires
 struct Arbres
 {
     ArbreMapAVL<string, vector<string>> arbreTypes;
@@ -25,6 +23,7 @@ void afficherValeurs(const vector<string> &elements);
 void afficherType(const Arbres &arbres, const string &type);
 void afficherFoncteur(const Arbres &arbres, const string &foncteur);
 
+// DEBUG
 void afficher_vector(vector<string> &v)
 {
     for (size_t i = 0; i < v.size(); i++)
@@ -36,6 +35,7 @@ void afficher_vector(vector<string> &v)
          << "----" << endl;
 }
 
+// Trouve une valeur dans un vecteur
 bool find_vector(vector<string> v, string element)
 {
     if (find(v.begin(), v.end(), element) != v.end())
@@ -43,7 +43,7 @@ bool find_vector(vector<string> v, string element)
     return false;
 }
 
-// Retire accolades parenthèses et virgules selon l'entrée
+// Retire accolades parenthèses et virgules selon l'entrée (type ou foncteur)
 string format(string &s, bool type)
 {
     if (type)
@@ -60,6 +60,7 @@ string format(string &s, bool type)
     return s;
 }
 
+// Répartit et sépare les entrées, sous forme de type ou sous forme de foncteur
 void repartirInputs(Arbres &arbres, vector<string> inputs)
 {
     istringstream stream;
@@ -96,6 +97,7 @@ void repartirInputs(Arbres &arbres, vector<string> inputs)
     }
 }
 
+// Insère le type dans l'arbre des types
 void insererType(Arbres &arbres, string type)
 {
     istringstream stream(type);
@@ -117,6 +119,7 @@ void insererType(Arbres &arbres, string type)
     }
 }
 
+// Insère le foncteur dans l'arbre des foncteurs
 void insererFoncteur(Arbres &arbres, vector<string> foncteur)
 {
     istringstream stream(foncteur[0]);
@@ -171,6 +174,7 @@ void insererFoncteur(Arbres &arbres, vector<string> foncteur)
     }
 }
 
+// 1e commande : Cherche les combinaisons existantes dans l'arbre des foncteurs, selon la position du '?'
 void chercherValeurPossible(const Arbres &arbres, const vector<string> &input, const string &identificateur, const size_t &position)
 {
     vector<vector<string>> elements = arbres.arbreFoncteurs[identificateur];
@@ -202,6 +206,7 @@ void chercherValeurPossible(const Arbres &arbres, const vector<string> &input, c
     afficherValeurs(valeurs_possibles);
 }
 
+// 1ere commande : Cherche le foncteur spécifié dans la commande ainsi que la position du '?' 
 void trouverFoncteur(const Arbres &arbres, const string &input)
 {
     string identificateur = input.substr(0, input.find("("));
@@ -237,6 +242,7 @@ void trouverFoncteur(const Arbres &arbres, const string &input)
     }
 }
 
+// Affiche toutes les valeurs d'un vecteur spécifié
 void afficherValeurs(const vector<string> &elements)
 {
     cout << "{";
@@ -249,12 +255,14 @@ void afficherValeurs(const vector<string> &elements)
     cout << "}" << endl;
 }
 
+// 2e commande : Cherche et retourne le type tel quel
 void afficherType(const Arbres &arbres, const string &type)
 {
     vector<string> elements = arbres.arbreTypes[type];
     afficherValeurs(elements);
 }
 
+// 3e commande : Cherche et retourne le foncteur tel quel
 void afficherFoncteur(const Arbres &arbres, const string &foncteur)
 {
     vector<vector<string>> elements = arbres.arbreFoncteurs[foncteur];
@@ -285,14 +293,14 @@ int main(int argc, char const *argv[])
     string input;
     entree.open(argv[1]);
 
+    // Lit le fichier en entrée
     while (getline(entree, input))
         inputs.push_back(input);
 
+    // Insère dans la base de connaissances
     repartirInputs(arbres, inputs);
 
-    // arbres.arbreTypes.afficher();
-    // arbres.arbreFoncteurs.afficher();
-
+    // Lit l'entrée standard
     while (getline(cin, input))
     {
         if (input.find("(") != string::npos)

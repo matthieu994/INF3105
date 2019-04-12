@@ -2,9 +2,8 @@
    INF3105 - Structures de données et algorithmes
    Squelette pour classe générique ArbreMapAVL<K, V> pour le Lab6 et le TP2.
 
-   AUTEUR(S):
-    1) Nom + Code permanent du l'étudiant.e 1
-    2) Nom + Code permanent du l'étudiant.e 2
+   AUTEUR:
+    1) Matthieu PETIT : PETM09089908
 */
 
 #if !defined(__ARBREMapAVL_H__)

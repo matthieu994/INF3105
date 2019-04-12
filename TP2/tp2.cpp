@@ -1,3 +1,10 @@
+/* UQAM / Département d'informatique
+   INF3105 - Structures de données et algorithmes
+
+   AUTEUR:
+    1) Matthieu PETIT : PETM09089908
+*/
+
 #include <iostream>
 #include <vector>
 #include <sstream>

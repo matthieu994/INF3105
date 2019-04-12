@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="file:/C:/Users/boust_000/Documents/Astounding%20Stories/magasine.rnc" type="application/relax-ng-compact-syntax"?>
+<magasine annee="1930" editeur="HARRY BATES" editeur_consultant="DOUGLAS M. DOLD" mois="APRIL"
+	no="1" proprietaire="W. M. CLAYTON" titre="ASTOUNDING STORIES OF SUPER-SCIENCE" vol="II">
+	<contenus>
+		<histoire auteur="Thomas H. Knight" page="9" titre="Test">Tom's
+			extraordinary machine glowed--and the years were banished from Old Crompton's body. banished
+            body crompton machine. Two miles west of the village of Laketon there lived an aged 
+			recluse who was known only as Old Crompton. As far back as the villagers could remember 
+			he had visited the town regularly twice a month, each time tottering his lonely way 
+			homeward with a load of provisions. He appeared to be well supplied with funds, but 
+			purchased sparingly as became a miserly hermit.
+        </histoire>
+    </contenus>
+</magasine>

@@ -25,6 +25,7 @@ public:
   void ajouterAreteOrientee(const S &s1, const S &s2);
   void ajouterAreteNonOrientee(const S &s1, const S &s2);
   void construireGraphe(Histoire *histoire);
+  double trouverChemin(int profondeur, Phrase depart, Phrase arrivee, map<int, Phrase> &chemin);
 
   // Interface public pour les requêtes de base.
   void parcoursRechercheProfondeur(const S &s) const;
@@ -33,6 +34,7 @@ public:
   void parcoursLargeurRec(const S &s) const;
   void extraireComposantesConnexes() const;
   void resetVisite() const;
+  bool estVoisin(const Phrase &sommet, const Phrase &voisin) const;
 
 private:
   struct Sommet
@@ -160,25 +162,56 @@ void Graphe<S>::construireGraphe(Histoire *histoire)
 
   for (Phrase phrase : phrases)
   {
-    pair<Phrase, int> sommet(phrase, count);
-    ajouterSommet(sommet);
+    ajouterSommet(phrase);
     count++;
-    cout << phrase.ordonnee() << "   LIEN: " << endl;
+    // cout << phrase.ordonnee() << "   LIEN: " << endl;
 
     for (Phrase phrase2 : vector<Phrase>(phrases.begin() + count, phrases.end()))
     {
 
-      cout << phrase2.ordonnee() << "   distance: " << phrase.distance(phrase2) << endl;
+      // cout << phrase2.ordonnee() << "   distance: " << phrase.distance(phrase2) << endl;
       if (phrase.distance(phrase2) > 0)
-      {
-        ajouterAreteOrientee(sommet, pair<Phrase, int>(phrase2, count));
-      }
+        ajouterAreteOrientee(phrase, phrase2);
     }
-    cout << endl;
+    // cout << endl;
   }
 
   cout << "Nombre sommets: " << sommets.size() << endl;
   return;
+}
+
+template <class S>
+bool Graphe<S>::estVoisin(const Phrase &sommet, const Phrase &voisin) const
+{
+  return sommets[sommet].voisins.find(voisin) != sommets[sommet].voisins.end();
+}
+
+template <class S>
+double Graphe<S>::trouverChemin(int profondeur, Phrase depart, Phrase arrivee, map<int, Phrase> &chemin)
+{
+  if (profondeur == 0 && depart == arrivee)
+    return 0;
+  if (profondeur == 1)
+    return depart.distance(arrivee);
+  if (profondeur <= 0)
+    return -1;
+
+  double shortPath = 999999999;
+
+  for (Phrase voisin : sommets[depart].voisins)
+  {
+    if (depart != voisin && arrivee != voisin)
+    {
+      double tempRes = trouverChemin(profondeur - 1, voisin, arrivee, chemin);
+      if (tempRes != -1 && tempRes < shortPath)
+      {
+        chemin[profondeur] = voisin;
+        shortPath = min(shortPath, depart.distance(voisin) + tempRes);
+      }
+    }
+
+    return shortPath;
+  }
 }
 
 #endif

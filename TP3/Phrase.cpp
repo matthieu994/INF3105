@@ -158,3 +158,8 @@ bool Phrase::operator!=(const Phrase &phrase) const
 {
     return _ordonnee != phrase._ordonnee;
 }
+
+bool Phrase::operator==(const Phrase &phrase) const
+{
+    return _ordonnee == phrase._ordonnee;
+}

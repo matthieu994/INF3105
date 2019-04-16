@@ -43,26 +43,38 @@ vector<Histoire *> *lireDocuments(string a_nomFichier)
 
 bool estCaractereMot(char c);
 
-int main()
+int main(int argc, char const *argv[])
 {
     vector<Histoire *> *histoires = lireDocuments(string("listeDocument.xml"));
 
-    string titre;
+    if (argv[1] == nullptr)
+    {
+        cerr << "Usage: " << argv[0] << " <titre>" << endl;
+        exit(1);
+    }
+
+    string titre = argv[1];
     Histoire *histoire;
 
-    while (getline(cin, titre))
-    {
-        histoire = findHistoire(*histoires, titre);
+    histoire = findHistoire(*histoires, titre);
 
-        if (histoire == nullptr)
+    if (histoire == nullptr)
+    {
+        cerr << "L'histoire '" << titre << "' n'existe pas." << endl;
+        exit(1);
+    }
+    else
+    {
+        Graphe<Phrase> graphe;
+        cout << "Histoire '" << titre << "' trouvée. Nombre phrases: " << histoire->end() - histoire->begin() << endl;
+        graphe.construireGraphe(histoire);
+
+        map<int, Phrase> path;
+        cout << graphe.trouverChemin(5, histoire->phrases().front(), histoire->phrases().back(), path) << endl;
+
+        for (size_t i = 1; i <= 5; i++)
         {
-            cout << "L'histoire '" << titre << "' n'existe pas." << endl;
-        }
-        else
-        {
-            Graphe<pair<Phrase, int>> graphe;
-            cout << "Histoire '" << titre << "' trouvée. Nombre phrases: " << histoire->getPhrases().size() << endl;
-            graphe.construireGraphe(histoire);
+            cout << path[i].ordonnee() << endl;
         }
     }
 }

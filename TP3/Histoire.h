@@ -33,6 +33,7 @@ public:
 
   void ajouterPhrase(Phrase a_phrase);
 
+  vector<Phrase> phrases() const { return _phrases; }
   vector<Phrase>::const_iterator begin(void) const;
   vector<Phrase>::const_iterator end(void) const;
 

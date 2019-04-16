@@ -27,6 +27,7 @@ public:
   virtual ~Phrase(void);
   bool operator<(const Phrase &) const;
   bool operator!=(const Phrase &) const;
+  bool operator==(const Phrase &) const;
 
   int nMot(void) const;
   int nLettre(void) const;

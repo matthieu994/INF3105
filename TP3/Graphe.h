@@ -12,6 +12,8 @@
 #include <map>
 #include <set>
 #include <iostream>
+#include <algorithm>
+#include <list>
 
 using namespace std;
 
@@ -97,11 +99,53 @@ int longueurChemin(const map<Phrase, pair<Phrase, double>> listeChemins, const P
   return length;
 }
 
+void afficherChemin(map<Phrase, pair<Phrase, double>> listeChemins, Phrase depart, Phrase arrivee)
+{
+  vector<Phrase> chemin;
+  auto parent = listeChemins.find(arrivee);
+  double total;
+
+  while (parent != listeChemins.end())
+  {
+    chemin.push_back(parent->first);
+    parent = listeChemins.find(parent->second.first);
+  }
+
+  chemin.push_back(depart);
+  reverse(chemin.begin(), chemin.end());
+
+  cout << "Taille: " << chemin.size() << endl;
+  for (size_t i = 0; i < chemin.size(); i++)
+  {
+    cout << chemin.at(i).original() << endl;
+    if (i < chemin.size() - 1)
+    {
+      total += chemin.at(i).distance(chemin.at(i + 1));
+      cout << "-> " << chemin.at(i).distance(chemin.at(i + 1)) << endl;
+    }
+  }
+  cout << "Total: " << total << endl;
+}
+
+double distanceChemin(map<Phrase, pair<Phrase, double>> listeChemins, Phrase courant, Phrase arrivee)
+{
+  auto parent = listeChemins.find(courant);
+  double total;
+
+  while (parent != listeChemins.end())
+  {
+    total += parent->second.second;
+    parent = listeChemins.find(parent->second.first);
+  }
+  return total + courant.distance(arrivee);
+}
+
 template <class S>
 double Graphe<S>::trouverChemin(Phrase depart, Phrase arrivee)
 {
   priority_queue<pair<Phrase, double>, vector<pair<Phrase, double>>, function<bool(pair<Phrase, double>, pair<Phrase, double>)>> queue(phraseComparator);
   map<Phrase, pair<Phrase, double>> listeChemins;
+  map<Phrase, bool> listeVisite;
   double meilleurChemin = 99999;
 
   queue.push(make_pair(depart, 0.0));
@@ -110,19 +154,23 @@ double Graphe<S>::trouverChemin(Phrase depart, Phrase arrivee)
   {
     Phrase courant = queue.top().first;
     double distanceTotal = queue.top().second;
+    listeVisite[courant] = true;
     queue.pop();
 
-    // cout << "courant: " << courant.original() << endl;
+    // cout << "* courant: " << courant.original() << endl;
     // cout << "distance totale: " << distanceTotal << endl;
     // cout << "voisins: " << sommets[courant].voisins.size() << endl;
-    if (distanceTotal + courant.distance(arrivee) < meilleurChemin && longueurChemin(listeChemins, courant) >= 3)
+    if (distanceChemin(listeChemins, courant, arrivee) < meilleurChemin && longueurChemin(listeChemins, courant) >= 3)
     {
+      // afficherChemin(listeChemins, courant, arrivee);
       meilleurChemin = distanceTotal + courant.distance(arrivee);
       listeChemins[arrivee] = make_pair(courant, courant.distance(arrivee));
       // cout << "Chemin taille 5 !" << endl;
-      // cout << "-> " << distanceTotal << " + " << courant.distance(arrivee) << endl;
+      // cout << "-> " << distanceChemin(listeChemins, courant, arrivee) << endl;
       // cout << meilleurChemin << endl;
-      continue;
+      courant = queue.top().first;
+      distanceTotal = queue.top().second;
+      queue.pop();
     }
 
     for (Phrase voisin : sommets[courant].voisins)
@@ -131,9 +179,11 @@ double Graphe<S>::trouverChemin(Phrase depart, Phrase arrivee)
 
       if (voisin == arrivee || distance == 0)
         continue;
-      if (listeChemins.find(voisin) == listeChemins.end() || distance < listeChemins[voisin].second)
+      if (listeVisite.find(voisin) != listeVisite.end())
+        continue;
+      if (courant == depart || distance < listeChemins[voisin].second)
       {
-        // cout << "voisin: " << voisin.original() << endl;
+        // cout << distance << " -> " << voisin.original() << endl;
         listeChemins[voisin] = make_pair(courant, distance);
         // cout << "listeChemins[" << voisin.ordonnee() << "] = " << courant.ordonnee() << endl;
         queue.push(make_pair(voisin, distanceTotal + distance));
@@ -142,14 +192,7 @@ double Graphe<S>::trouverChemin(Phrase depart, Phrase arrivee)
     // cout << endl;
   }
 
-  cout << "Meilleur chemin: " << meilleurChemin << endl;
-
-  auto parent = listeChemins.find(arrivee);
-  while (parent != listeChemins.end())
-  {
-    cout << parent->first.original() << endl;
-    parent = listeChemins.find(parent->second.first);
-  }
+  afficherChemin(listeChemins, depart, arrivee);
 
   return 0.0;
 }

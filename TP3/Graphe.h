@@ -22,25 +22,17 @@ class Graphe
 public:
   // Interface public pour créer le graphe.
   void ajouterSommet(const S &s);
-  void ajouterAreteOrientee(const S &s1, const S &s2);
-  void ajouterAreteNonOrientee(const S &s1, const S &s2);
   void construireGraphe(Histoire *histoire);
-  double trouverChemin(int profondeur, Phrase depart, Phrase arrivee, map<int, Phrase> &chemin);
+  double trouverChemin(Phrase depart, Phrase arrivee);
+  void setVoisins(const S &s, set<S> voisins);
 
   // Interface public pour les requêtes de base.
-  void parcoursRechercheProfondeur(const S &s) const;
-  void parcoursProfondeurRec(const S &s) const;
-  void parcoursRechercheLargeur(const S &s) const;
-  void parcoursLargeurRec(const S &s) const;
-  void extraireComposantesConnexes() const;
-  void resetVisite() const;
-  bool estVoisin(const Phrase &sommet, const Phrase &voisin) const;
 
 private:
   struct Sommet
   {
-    mutable bool estVisite;
     set<S> voisins; // ensemble des sommets accessibles via les arêtes sortantes du sommet.
+  public:
   };
   map<S, Sommet> sommets; // identification --> sommet
 };
@@ -51,167 +43,115 @@ void Graphe<S>::ajouterSommet(const S &s)
   sommets[s] = Sommet();
 }
 
-// Doit ajouter les 2 arêtes orientées : s1->s2 et s2->s1;
 template <class S>
-void Graphe<S>::ajouterAreteNonOrientee(const S &s1, const S &s2)
+void Graphe<S>::setVoisins(const S &s, set<S> voisins)
 {
-  ajouterAreteOrientee(s1, s2);
-  ajouterAreteOrientee(s2, s1);
-}
-
-// Doit uniquement ajouter s1->s2.
-template <class S>
-void Graphe<S>::ajouterAreteOrientee(const S &s1, const S &s2)
-{
-  sommets[s1].voisins.insert(s2);
-}
-
-template <class S>
-void Graphe<S>::parcoursRechercheProfondeur(const S &s) const
-{
-  resetVisite();
-  parcoursProfondeurRec(s);
-  cout << endl;
-}
-
-template <class S>
-void Graphe<S>::parcoursProfondeurRec(const S &s) const
-{
-  sommets.at(s).estVisite = true;
-  cout << s << " ";
-
-  for (const S &voisin : sommets.at(s).voisins)
-  {
-    if (!sommets.at(voisin).estVisite)
-      parcoursProfondeurRec(voisin);
-  }
-}
-
-template <class S>
-void Graphe<S>::parcoursRechercheLargeur(const S &s) const
-{
-  resetVisite();
-
-  queue<S> file;
-  sommets.at(s).estVisite = true;
-  file.push(s);
-
-  while (!file.empty())
-  {
-    S elem = file.front();
-    file.pop();
-    cout << elem << " ";
-
-    for (const S &voisin : sommets.at(elem).voisins)
-    {
-      if (!sommets.at(voisin).estVisite)
-      {
-        sommets.at(voisin).estVisite = true;
-        file.push(voisin);
-      }
-    }
-  }
-
-  cout << endl;
-}
-
-template <class S>
-void Graphe<S>::extraireComposantesConnexes() const
-{
-  resetVisite();
-  std::cout << "{ ";
-  for (const auto &pair : sommets)
-  {
-    if (pair.second.estVisite)
-      continue;
-    std::cout << "{ ";
-    std::queue<S> file;
-    pair.second.estVisite = true;
-    file.push(pair.first);
-    while (!file.empty())
-    {
-      S elem = file.front();
-      file.pop();
-      std::cout << elem << " ";
-      const Sommet &sommet = sommets.at(elem);
-
-      for (const S &voisin : sommet.voisins)
-        if (!sommets.at(voisin).estVisite)
-        {
-          sommets.at(voisin).estVisite = true;
-          file.push(voisin);
-        }
-    }
-    std::cout << "}";
-  }
-  std::cout << " }" << std::endl;
-}
-
-template <class S>
-void Graphe<S>::resetVisite() const
-{
-  for (auto &pair : sommets)
-    pair.second.estVisite = false;
+  // cout << s.ordonnee() << " | voisins: " << endl;
+  // for (auto it = voisins.begin(); it != voisins.end(); ++it)
+  // {
+  //   if (s.distance(*it) == 0)
+  //     voisins.erase(it);
+  //   else
+  //   {
+  //     // cout << it->ordonnee() << endl;
+  //   }
+  // }
+  // cout << endl;
+  sommets[s].voisins = voisins;
 }
 
 template <class S>
 void Graphe<S>::construireGraphe(Histoire *histoire)
 {
   int count = 0;
-  vector<Phrase> phrases(histoire->begin(), histoire->end() - 1);
+  vector<Phrase> phrases(histoire->begin(), histoire->end());
 
   for (Phrase phrase : phrases)
   {
     ajouterSommet(phrase);
     count++;
-    // cout << phrase.ordonnee() << "   LIEN: " << endl;
-
-    for (Phrase phrase2 : vector<Phrase>(phrases.begin() + count, phrases.end()))
-    {
-
-      // cout << phrase2.ordonnee() << "   distance: " << phrase.distance(phrase2) << endl;
-      if (phrase.distance(phrase2) > 0)
-        ajouterAreteOrientee(phrase, phrase2);
-    }
-    // cout << endl;
+    setVoisins(phrase, set<Phrase>(histoire->begin() + count, histoire->end()));
   }
 
   cout << "Nombre sommets: " << sommets.size() << endl;
   return;
 }
 
-template <class S>
-bool Graphe<S>::estVoisin(const Phrase &sommet, const Phrase &voisin) const
+bool phraseComparator(const pair<Phrase, double> p1, const pair<Phrase, double> p2)
 {
-  return sommets[sommet].voisins.find(voisin) != sommets[sommet].voisins.end();
+  return p1.second > p2.second;
+}
+
+int longueurChemin(const map<Phrase, pair<Phrase, double>> listeChemins, const Phrase phrase)
+{
+  int length = 0;
+
+  auto parent = listeChemins.find(phrase);
+  while (parent != listeChemins.end())
+  {
+    // cout << parent->first.ordonnee() << endl;
+    parent = listeChemins.find(parent->second.first);
+    length++;
+  }
+
+  return length;
 }
 
 template <class S>
-double Graphe<S>::trouverChemin(int profondeur, Phrase depart, Phrase arrivee, map<int, Phrase> &chemin)
+double Graphe<S>::trouverChemin(Phrase depart, Phrase arrivee)
 {
-  if (profondeur == 0 && depart == arrivee)
-    return 0;
-  if (profondeur == 1)
-    return depart.distance(arrivee);
-  if (profondeur <= 0)
-    return -1;
+  priority_queue<pair<Phrase, double>, vector<pair<Phrase, double>>, function<bool(pair<Phrase, double>, pair<Phrase, double>)>> queue(phraseComparator);
+  map<Phrase, pair<Phrase, double>> listeChemins;
+  double meilleurChemin = 99999;
 
-  double shortPath = 999999999;
+  queue.push(make_pair(depart, 0.0));
 
-  for (Phrase voisin : sommets[depart].voisins)
+  while (!queue.empty())
   {
-    if (depart != voisin && arrivee != voisin)
+    Phrase courant = queue.top().first;
+    double distanceTotal = queue.top().second;
+    queue.pop();
+
+    // cout << "courant: " << courant.original() << endl;
+    // cout << "distance totale: " << distanceTotal << endl;
+    // cout << "voisins: " << sommets[courant].voisins.size() << endl;
+    if (distanceTotal + courant.distance(arrivee) < meilleurChemin && longueurChemin(listeChemins, courant) >= 3)
     {
-      double tempRes = trouverChemin(profondeur - 1, voisin, arrivee, chemin);
-      if (tempRes != -1 && tempRes < shortPath)
-      {
-        chemin[profondeur] = voisin;
-        shortPath = min(shortPath, depart.distance(voisin) + tempRes);
-      }
+      meilleurChemin = distanceTotal + courant.distance(arrivee);
+      listeChemins[arrivee] = make_pair(courant, courant.distance(arrivee));
+      // cout << "Chemin taille 5 !" << endl;
+      // cout << "-> " << distanceTotal << " + " << courant.distance(arrivee) << endl;
+      // cout << meilleurChemin << endl;
+      continue;
     }
 
-    return shortPath;
+    for (Phrase voisin : sommets[courant].voisins)
+    {
+      double distance = courant.distance(voisin);
+
+      if (voisin == arrivee || distance == 0)
+        continue;
+      if (listeChemins.find(voisin) == listeChemins.end() || distance < listeChemins[voisin].second)
+      {
+        // cout << "voisin: " << voisin.original() << endl;
+        listeChemins[voisin] = make_pair(courant, distance);
+        // cout << "listeChemins[" << voisin.ordonnee() << "] = " << courant.ordonnee() << endl;
+        queue.push(make_pair(voisin, distanceTotal + distance));
+      }
+    }
+    // cout << endl;
   }
+
+  cout << "Meilleur chemin: " << meilleurChemin << endl;
+
+  auto parent = listeChemins.find(arrivee);
+  while (parent != listeChemins.end())
+  {
+    cout << parent->first.original() << endl;
+    parent = listeChemins.find(parent->second.first);
+  }
+
+  return 0.0;
 }
 
 #endif

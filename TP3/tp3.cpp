@@ -69,12 +69,6 @@ int main(int argc, char const *argv[])
         cout << "Histoire '" << titre << "' trouvée. Nombre phrases: " << histoire->end() - histoire->begin() << endl;
         graphe.construireGraphe(histoire);
 
-        map<int, Phrase> path;
-        cout << graphe.trouverChemin(5, histoire->phrases().front(), histoire->phrases().back(), path) << endl;
-
-        for (size_t i = 1; i <= 5; i++)
-        {
-            cout << path[i].ordonnee() << endl;
-        }
+        graphe.trouverChemin(histoire->phrases()->front(), histoire->phrases()->back());
     }
 }

@@ -153,11 +153,14 @@ Histoire *findHistoire(const vector<Histoire *> histoires, const string titre)
             // Insérer Partie X dans Partie 1
             else
             {
-                for (Phrase phrase : vector<Phrase>(match->begin(), match->end()))
-                    match->ajouterPhrase(phrase);
+                match->phrases()->pop_back();
+                match->phrases()->insert(match->end(), histoire->begin(), histoire->end());
             }
         }
     }
+
+    if (match != nullptr)
+        match->phrases()->pop_back();
 
     return match;
 }

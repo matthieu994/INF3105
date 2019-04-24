@@ -150,11 +150,11 @@ Histoire *findHistoire(const vector<Histoire *> histoires, const string titre)
             {
                 match = new Histoire(*histoire);
             }
-            // Insérer Partie X dans Partie 1
+            // Insérer Partie X dans Partie 1 et retirer derniere phrase de Partie 1
             else
             {
                 match->phrases()->pop_back();
-                match->phrases()->insert(match->end(), histoire->begin(), histoire->end());
+                match->phrases()->insert(match->phrases()->end(), histoire->phrases()->begin(), histoire->phrases()->end());
             }
         }
     }

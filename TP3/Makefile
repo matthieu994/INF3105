@@ -10,16 +10,16 @@ FLAGS = -Wall -std=c++11
 all : histoire.o phrase.o documentXML.o tp3.o compile
 
 histoire.o : Histoire.cpp Histoire.h
-	g++ -c -o Histoire.o Histoire.cpp
+	g++ -c -o Histoire.o Histoire.cpp $(FLAGS)
 
 phrase.o : Phrase.cpp Phrase.h
-	g++ -c -o Phrase.o Phrase.cpp
+	g++ -c -o Phrase.o Phrase.cpp $(FLAGS)
 
 documentXML.o : DocumentXML.cpp DocumentXML.h
-	g++ -c -o DocumentXML.o DocumentXML.cpp
+	g++ -c -o DocumentXML.o DocumentXML.cpp $(FLAGS)
 
 tp3.o : tp3.cpp Graphe.h
-	g++ -c -o tp3.o tp3.cpp
+	g++ -c -o tp3.o tp3.cpp $(FLAGS)
 
 compile :
 	g++ -o $(EXEC) $(OBJECTS) $(FLAGS)

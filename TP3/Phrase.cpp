@@ -145,7 +145,7 @@ double Phrase::rougeW_ord(const Phrase &a_phrase, function<double(double)> a_f) 
 
 double Phrase::distance(const Phrase &a_phrase) const
 {
-    double r = rougeW_ord(a_phrase, [](double x) { return x * x; });
+    double r = rougeW_ord(a_phrase, [](double x) { return x; });
     return r == 0.0 ? 0.0 : 1.0 - r;
 }
 

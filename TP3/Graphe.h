@@ -114,10 +114,10 @@ void afficherChemin(map<Phrase, pair<Phrase, double>> listeChemins, Phrase depar
   chemin.push_back(depart);
   reverse(chemin.begin(), chemin.end());
 
-  cout << "Taille originale: " << chemin.size() << endl;
+  // cout << "Taille originale: " << chemin.size() << endl;
 
-  while (chemin.size() > 5)
-    chemin.erase(chemin.end() - 2);
+  // while (chemin.size() > 5)
+  // chemin.erase(chemin.end() - 2);
 
   cout << "Taille: " << chemin.size() << endl;
   for (size_t i = 0; i < chemin.size(); i++)
@@ -152,9 +152,10 @@ double Graphe<S>::trouverChemin(Phrase depart, Phrase arrivee)
   {
     Phrase courant = queue.top().first;
     double distanceTotal = queue.top().second;
+    int nombreSommets = longueurChemin(listeChemins, courant, depart);
     queue.pop();
 
-    if (listeVisite.find(courant) != listeVisite.end())
+    if (listeVisite.find(courant) != listeVisite.end() || nombreSommets >= 4)
       continue;
     else
       listeVisite[courant] = true;
@@ -162,7 +163,7 @@ double Graphe<S>::trouverChemin(Phrase depart, Phrase arrivee)
     // cout << "* courant: " << courant.original() << endl;
     // cout << "distance totale: " << distanceTotal << endl;
     // cout << "voisins: " << sommets[courant].voisins.size() << endl;
-    if (distanceTotal + courant.distance(arrivee) < meilleurChemin && longueurChemin(listeChemins, courant, depart) >= 3 && courant.distance(arrivee) > 0)
+    /*if (distanceTotal + courant.distance(arrivee) < meilleurChemin && longueurChemin(listeChemins, courant, depart) >= 3 && courant.distance(arrivee) > 0)
     {
       // afficherChemin(listeChemins, courant, arrivee);
       meilleurChemin = distanceTotal + courant.distance(arrivee);
@@ -171,19 +172,37 @@ double Graphe<S>::trouverChemin(Phrase depart, Phrase arrivee)
       // cout << "-> " << distanceTotal << endl << endl;
       // cout << meilleurChemin << endl;
       continue;
-    }
+    }*/
 
     for (Phrase voisin : sommets[courant].voisins)
     {
       double distance = courant.distance(voisin);
 
-      if (voisin == arrivee || distance == 0)
+      if (distance == 0)
         continue;
+
+      if (voisin == arrivee)
+      {
+        if (distanceTotal + courant.distance(voisin) < meilleurChemin && nombreSommets >= 3)
+        {
+          meilleurChemin = distanceTotal + courant.distance(arrivee);
+          listeChemins[arrivee] = make_pair(courant, courant.distance(arrivee));
+        }
+        else
+          continue;
+      }
+
       if (listeVisite.find(voisin) != listeVisite.end())
         continue;
+
       // cout << distance << " < " << listeChemins[voisin].second << " ?  " << voisin.original() << endl;
       if (distance <= listeChemins[voisin].second)
       {
+        if (distanceTotal + distance + voisin.distance(arrivee) < meilleurChemin && nombreSommets >= 3 && voisin.distance(arrivee) > 0)
+        {
+          meilleurChemin = distanceTotal + distance + voisin.distance(arrivee);
+          listeChemins[arrivee] = make_pair(voisin, voisin.distance(arrivee));
+        }
         // cout << distance << " -> " << voisin.original();
         // cout << "REMPLACÉ" << endl;
         // cout << " <-- PREV: " << listeChemins[voisin].second << endl;

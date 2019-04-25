@@ -66,9 +66,8 @@ int main(int argc, char const *argv[])
     else
     {
         Graphe<Phrase> graphe;
-        cout << "Histoire '" << titre << "' trouvée. Nombre phrases: " << histoire->end() - histoire->begin() << endl;
+        // cout << "Histoire '" << titre << "' trouvée. Nombre phrases: " << histoire->end() - histoire->begin() << endl;
         graphe.construireGraphe(histoire);
-
         graphe.trouverChemin(histoire->phrases()->front(), histoire->phrases()->back());
     }
 }

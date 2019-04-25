@@ -127,6 +127,9 @@ vector<Histoire *> *extraireHistoires(const DocumentXML &a_document)
     return resultat;
 }
 
+// Trouve l'histoire sélectionnée en argument
+// histoires: liste des histoires lues
+// titre: titre de l'histoire choisie
 Histoire *findHistoire(const vector<Histoire *> histoires, const string titre)
 {
     Histoire *match = nullptr;
@@ -159,6 +162,7 @@ Histoire *findHistoire(const vector<Histoire *> histoires, const string titre)
         }
     }
 
+    // Retire la dernière phrase (vide)
     if (match != nullptr)
         match->phrases()->pop_back();
 

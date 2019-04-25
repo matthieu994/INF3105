@@ -4,7 +4,7 @@ OBJECTS = Histoire.o Phrase.o DocumentXML.o tp3.o
 # The executable file that will be created at the end
 EXEC = tp3
 # The flags to use for compilation
-FLAGS = -Wall -std=c++11
+FLAGS = -std=c++11
 
 # Perform action on all object files (May or may not exist)
 all : histoire.o phrase.o documentXML.o tp3.o compile
